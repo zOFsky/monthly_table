@@ -1,16 +1,26 @@
 import pandas as pd
-from datetime import datetime
+import json
+import functions as fun
 
-days_in_month = 31
+# Load the config file
+with open('config.json', 'r', encoding='utf-8') as file:
+    config = json.load(file)
+
+# Access values
+year = config['year']
+month = config['month_int']
+days_in_month = config['days_in_month']
+duties = config['duties_2_days']
+
 
 # Load the Excel file and the specific sheet into a DataFrame
-df = pd.read_excel('october_edited_colored.xlsx')
+df = pd.read_excel('with_calculated_days.xlsx')
 
 # Create the 'days_list' column by iterating over each row
 def create_days_list(row):
     days = []
     for col in range(1, days_in_month+1):  # Iterate over columns 1 to 31
-        if row[str(col)] in ['БЧ','МВГ', 'ОВО', 'Р', 'МЗ', 'ЛЗ','НО', "2"]:
+        if row[str(col)] in (duties + ['АРБА',"2"]):
             days.append(col)
     return days
 
@@ -55,48 +65,11 @@ df['days_list'] = df.apply(create_days_list, axis=1)
 df['intervals'] = df['days_list'].apply(squash_intervals)
 
 
-# Sample dataframe (adjust as per your actual data)
-# df = pd.DataFrame({'intervals': [[[1, 5], [10, 15]], [], [[20, 25]]]})
-
-def extract_dates(intervals_column, month, year):
-    # Helper function to convert day, month, and year into 'dd.mm.yyyy' format
-    def convert_to_date(day, month, year):
-        date_obj = datetime(year, month, day)
-        return date_obj.strftime('%d.%m.%Y')
-
-    # Function to extract dates from intervals
-    def get_dates(intervals, month, year):
-        from_dates = []
-        to_dates = []
-
-        for interval in intervals:
-            if interval:  # Check if interval is not empty
-                from_day = interval[0]  # First element of the interval
-                to_day = interval[1]  # Second element of the interval
-
-                # Convert days to date strings
-                from_dates.append(convert_to_date(from_day, month, year))
-                to_dates.append(convert_to_date(to_day, month, year))
-
-        # Join dates with breaklines ('\n')
-        return '\n'.join(from_dates), '\n'.join(to_dates)
-
-    # Apply the get_dates function to each row
-    df['from'] = df['intervals'].apply(lambda x: get_dates(x, month, year)[0])
-    df['to'] = df['intervals'].apply(lambda x: get_dates(x, month, year)[1])
-
-
-# Parameters for the function (adjust month and year as needed)
-month = 10  # Example: September
-year = 2024
-
 # Apply the function to the DataFrame
-extract_dates(df['intervals'], month, year)
+fun.extract_dates(df, month, year)
 
 # Save the updated DataFrame to Excel (if needed)
-# df.to_excel('your_file_updated.xlsx', sheet_name='пораховані дні', index=False)
 output_file = "result_int.xlsx"
-# Write to Excel using xlsxwriter to enable text wrapping
 
 # Write to Excel using xlsxwriter to enable text wrapping
 with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:

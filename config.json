@@ -1,0 +1,11 @@
+{
+    "year": 2025,
+    "month": "january",
+    "month_int": 1,
+    "days_in_month": 31,
+    "input_folder": "01_january",
+    "output_folder": "outputs",
+    "roster_file": "roster_jan_clean.xlsx",
+    "duties_2_days": ["БЧ", "МВГ", "ОВО", "Р", "МЗ", "ЛЗ","НО", "ДК", "ППП", "ЛЕБ"],
+    "arba_days": ["14", "23", "26"]
+}

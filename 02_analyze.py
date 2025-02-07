@@ -1,9 +1,16 @@
 import os
+import json
 import pandas as pd
+from functions import analyze_dataframes
 
+# Load the config file
+with open('config.json', 'r') as file:
+    config = json.load(file)
 
-days_in_month = 31
-month = 'oct'
+# Access values
+month = config['month']
+days_in_month = config['days_in_month']
+
 
 def save_list_to_excel(lst, filename):
     """Save list to an Excel file with 1 value per row."""
